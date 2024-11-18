@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Linq.Expressions;
 
 namespace NewSORT
 {
@@ -11,27 +14,30 @@ namespace NewSORT
     {
         static void Main(string[] args)
         {
-            //FileSplit("input.txt");
+            FileSplit("input_big.txt");
+            
             LinkedList<int> firstFile = GetData("Output_1.txt");
             LinkedList<int> secondFile = GetData("Output_2.txt");
-            //Console.WriteLine(firstFile.Find(firstFile.Max()));
-            //var item = firstFile.First;
-            //while (item != null)
-            //{
-            //    Console.WriteLine(item.Value);
-            //    item = item.Next;
-            //}
-            List<int> _sortedList = new List<int>();
+            LinkedList<int> thirdFile = GetData("Output_3.txt");
+            LinkedList<int> fourthFile = GetData("Output_4.txt");
+            
 
             List<LinkedList<int>> joinQueues = new List<LinkedList<int>>() ;
             joinQueues.Add(firstFile);
             joinQueues.Add(secondFile);
-            List<int> indexes = new List<int> { 0, 1 };
-            List<int> workSpace = getWorkSpace(joinQueues, indexes);
-            indexes = Algorithm(workSpace, _sortedList);
+            joinQueues.Add(thirdFile);
+            joinQueues.Add(fourthFile);
 
-            workSpace = getWorkSpace(joinQueues, indexes);
-            Console.ReadKey();
+            List<int> result = SortThis(joinQueues);
+
+            string line = "";
+            foreach (int number in result)
+            {
+                line = line + number + '\t';
+            }
+            File.WriteAllText("result.txt", line);
+
+           
         }
 
         //Получение очередей <int>
@@ -50,40 +56,97 @@ namespace NewSORT
                     }
                 }
             }
+            output.Sort();
+            output.Reverse();
             return new LinkedList<int>(output);
         }
         
-        private static List<int> getWorkSpace(List<LinkedList<int>> queues, List<int> indexes)
+        private static List<int> SortThis(List<LinkedList<int>> queues)
         {
-            List<int> output = new List<int>();
-
-            foreach (var index in indexes)
+            List<int> sortedResult = new List<int>();
+            List<LinkedListNode<int>> workSpace = new List<LinkedListNode<int>>();
+            for (int i = 0; i < queues.Count; i++)
             {
-                output.Add(queues[index].First());
-                queues[index].RemoveFirst();
-                
+                workSpace.Add(queues[i].First);
             }
-
-            return output;
+            sortedResult = SortingViaMax(workSpace);
+            return sortedResult;
         }
 
-        private static List<int> Algorithm(List<int> workSpace, List<int> maxElements)
+        private static List<int> SortingViaMax(List<LinkedListNode<int>> workSpace)
         {
-            List<int> indexOfQ = new List<int>();
-            int firstMax = workSpace.Max();
-            int nextMax = 0;
-            indexOfQ.Add(workSpace.IndexOf(firstMax));
-            do
+            List<int> sortedValue = new List<int>();
+
+            while (!isWorkSapceEmpty(workSpace))
             {
-                workSpace.Remove(firstMax);
-                nextMax = workSpace.Max();
+                LinkedListNode<int> maxNode = FindMaxNode(workSpace);
+                sortedValue.Add(maxNode.Value);
+                workSpace[workSpace.IndexOf(maxNode)] = maxNode.Next;
+            }
 
-            } while (firstMax == nextMax);
+            return sortedValue;
+        }
 
-            List<int> maximums = maxElements;
-            maximums.Add(firstMax);
-            maxElements = maximums;
-            return indexOfQ;
+        private static LinkedListNode<int> FindMaxNode(List<LinkedListNode<int>> workSpace)
+        {
+            workSpace = DeleteEmptyNodes(workSpace);
+            LinkedListNode<int> result = workSpace.First();
+            if (workSpace.First() != null)
+            {
+                int maxValue = workSpace.First().Value;
+                foreach (LinkedListNode<int> node in workSpace)
+                {
+                    if (node.Value > maxValue)
+                    {
+                        result = node;
+                        maxValue = node.Value;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        private static List<LinkedListNode<int>> DeleteEmptyNodes(List<LinkedListNode<int>> workSpace)
+        {
+            List<LinkedListNode<int>> result = new List<LinkedListNode<int>>();
+            foreach (var node in workSpace)
+            {
+                if (node != null)
+                {
+                    result.Add(node);
+                }
+            }
+
+            return result;
+        }
+
+        private static bool isWorkSapceEmpty(List<LinkedListNode<int>> workSpace)
+        {
+            bool result = true;
+            foreach (var node in workSpace)     
+            {
+                if (node != null)
+                {
+                    result = false;
+                }
+            }
+
+            return result;
+        }
+        
+        private static void printList(List<int> list, string name)
+        {
+            Console.WriteLine(Environment.NewLine + name + ":");
+            for (var index = 0; index < list.Count; index++)
+            {
+                var i = list[index];
+                Console.Write(i + "\t");
+                if (index !=0 && index % 15 == 0)
+                {
+                    //Console.Write(Environment.NewLine);
+                }
+            }
         }
 
         private static void FileSplit(string inputPath)
@@ -116,6 +179,7 @@ namespace NewSORT
                 linesReady++;
 
             }
+
         }
     }
 }

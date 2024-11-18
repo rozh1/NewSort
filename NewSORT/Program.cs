@@ -22,11 +22,13 @@ namespace NewSORT
             LinkedList<int> fourthFile = GetData("Output_4.txt");
             
 
-            List<LinkedList<int>> joinQueues = new List<LinkedList<int>>() ;
-            joinQueues.Add(firstFile);
-            joinQueues.Add(secondFile);
-            joinQueues.Add(thirdFile);
-            joinQueues.Add(fourthFile);
+            List<LinkedList<int>> joinQueues = new List<LinkedList<int>>
+            {
+                firstFile,
+                secondFile,
+                thirdFile,
+                fourthFile
+            };
 
             List<int> result = SortThis(joinQueues);
 
@@ -63,13 +65,12 @@ namespace NewSORT
         
         private static List<int> SortThis(List<LinkedList<int>> queues)
         {
-            List<int> sortedResult = new List<int>();
-            List<LinkedListNode<int>> workSpace = new List<LinkedListNode<int>>();
-            for (int i = 0; i < queues.Count; i++)
+            List<LinkedListNode<int>> workSpace = new List<LinkedListNode<int>>();  //создание рабочей области и добавление первых элементов очередей
+            for (int i = 0; i < queues.Count; i++)                                  //подразумевается, что очереди не пустые
             {
                 workSpace.Add(queues[i].First);
             }
-            sortedResult = SortingViaMax(workSpace);
+            var sortedResult = SortingViaMax(workSpace);
             return sortedResult;
         }
 
@@ -77,11 +78,11 @@ namespace NewSORT
         {
             List<int> sortedValue = new List<int>();
 
-            while (!isWorkSapceEmpty(workSpace))
+            while (!IsWorkSapceEmpty(workSpace))                                    //проверка, что ещё есть элементы в очередях
             {
-                LinkedListNode<int> maxNode = FindMaxNode(workSpace);
-                sortedValue.Add(maxNode.Value);
-                workSpace[workSpace.IndexOf(maxNode)] = maxNode.Next;
+                LinkedListNode<int> maxNode = FindMaxNode(workSpace);               //поиск максимального элемента в рабочей области
+                sortedValue.Add(maxNode.Value);                                     //добавление значения в результат
+                workSpace[workSpace.IndexOf(maxNode)] = maxNode.Next;               //продвежение очереди с максимальным элементом(первым) !наверное можно оптимизировать продвижение нескольких очередей
             }
 
             return sortedValue;
@@ -109,6 +110,7 @@ namespace NewSORT
 
         private static List<LinkedListNode<int>> DeleteEmptyNodes(List<LinkedListNode<int>> workSpace)
         {
+            //удаление пустых нод(соответсвенно очередей) из рабочей области
             List<LinkedListNode<int>> result = new List<LinkedListNode<int>>();
             foreach (var node in workSpace)
             {
@@ -121,7 +123,7 @@ namespace NewSORT
             return result;
         }
 
-        private static bool isWorkSapceEmpty(List<LinkedListNode<int>> workSpace)
+        private static bool IsWorkSapceEmpty(List<LinkedListNode<int>> workSpace)
         {
             bool result = true;
             foreach (var node in workSpace)     
@@ -135,7 +137,7 @@ namespace NewSORT
             return result;
         }
         
-        private static void printList(List<int> list, string name)
+        private static void PrintList(List<int> list, string name)
         {
             Console.WriteLine(Environment.NewLine + name + ":");
             for (var index = 0; index < list.Count; index++)

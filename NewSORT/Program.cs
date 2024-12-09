@@ -7,15 +7,42 @@ namespace NewSORT
 {
     class Program
     {
+
         static void Main(string[] args)
         {
-            //SortIntFiles();
-            SortTableFiles();
+            LinkedList<RowStructure> firstFile = GetData("First1", 1);
+            LinkedList<RowStructure> secondFile = GetData("First2", 1);
+            LinkedList<RowStructure> thirdFile = GetData("Last1_O", 3);
+            LinkedList<RowStructure> fourthFile = GetData("Last2_O", 3);
+
+
+            List<LinkedList<RowStructure>> joinQueues = new List<LinkedList<RowStructure>>
+            {
+                //firstFile,
+                //secondFile,
+                thirdFile,
+                fourthFile
+            };
+            SortTableFiles(joinQueues);
+
+            //Console.WriteLine("Выберите необходимый тест: \n\t 0 - LINQ \n\t 1 - 1x файл \n\t 2 - 2x файл");
+            //SortTableFilesTest(Console.ReadLine());
         }
 
-        private static void SortTableFiles()
+        private static void SortTableFiles(List<LinkedList<RowStructure>> joinQueues)
         {
+            List<RowStructure> result = new List<RowStructure>();
+            result = SortThis(joinQueues, true);
+            string line = string.Empty;
+            foreach (RowStructure row in result)
+            {
+                Console.WriteLine(row.GetRow());
+            }
 
+        }
+
+        private static void SortTableFilesTest(string str)
+        {
             LinkedList<RowStructure> firstFile = GetData("First1", 1);
             LinkedList<RowStructure> secondFile = GetData("First2", 1);
             LinkedList<RowStructure> thirdFile = GetData("Last1_O", 3);
@@ -29,38 +56,43 @@ namespace NewSORT
                 //thirdFile,
                 //fourthFile
             };
-
             DateTime startTime = DateTime.Now;
             List<RowStructure> result = new List<RowStructure>();
-            LinkedList<RowStructure> bigFile = new LinkedList<RowStructure>();
-            List<RowStructure> bigFileList = new List<RowStructure>();
 
+            switch (str)
+            {
+                case "0":
+                    {
+                        List<RowStructure> bigFileList = new List<RowStructure>();
+                        bigFileList = GetData("FirstB", 1).ToList();
+                        startTime = DateTime.Now;
+                        bigFileList.Sort();
+                        Console.WriteLine(String.Format("Время сортировки 1х ={0} LINQ", (DateTime.Now - startTime).Milliseconds));
 
+                        break;
+                    }
+                case "1":
+                    {
 
-            //bigFile =  GetData("FirstB",1);
-            //joinQueues = new List<LinkedList<RowStructure>> { bigFile };
-            //startTime = DateTime.Now;
-            //result = SortThis(joinQueues);
-            //Console.WriteLine(String.Format("Время сортировки 1х по 20к={0}", ( DateTime.Now - startTime).Milliseconds));
+                        LinkedList<RowStructure> bigFile = new LinkedList<RowStructure>();
+                        bigFile = GetData("FirstB", 1);
+                        joinQueues = new List<LinkedList<RowStructure>> { bigFile };
+                        startTime = DateTime.Now;
+                        result = SortThis(joinQueues, true);
+                        Console.WriteLine(String.Format("Время сортировки 1х ={0}", (DateTime.Now - startTime).Milliseconds));
 
-            //startTime = DateTime.Now;
-            //result = SortThis(joinQueues);
-            //Console.WriteLine(String.Format("Время сортировки 2х по 10к={0}", (DateTime.Now - startTime).Milliseconds));
-
-            bigFileList = GetData("FirstB", 1).ToList();
-            startTime = DateTime.Now;
-            bigFileList.Sort();
-            Console.WriteLine(String.Format("Время сортировки 1х по 20к={0} LINQ", (DateTime.Now - startTime).Milliseconds));
+                        break;
+                    }
+                case "2":
+                    {
+                        startTime = DateTime.Now;
+                        result = SortThis(joinQueues, true);
+                        Console.WriteLine(String.Format("Время сортировки 2х ={0}", (DateTime.Now - startTime).Milliseconds));
+                        break;
+                    }
+            }
 
             Console.ReadKey();
-
-            //string line = string.Empty;
-            //foreach (RowStructure row in result)
-            //{
-            //    line = line + row.GetRow() + Environment.NewLine;
-            //}
-            //File.WriteAllText("result.txt", line);
-            
         }
         private static void SortIntFiles()
         {
@@ -229,14 +261,23 @@ namespace NewSORT
         }   //Получение СТРОКИ из текстовой строки
 
         #region сортировка СТРОК
-        private static List<RowStructure> SortThis(List<LinkedList<RowStructure>> queues)
+        private static List<RowStructure> SortThis(List<LinkedList<RowStructure>> queues, bool ascending)
         {
             List<LinkedListNode<RowStructure>> workSpace = new List<LinkedListNode<RowStructure>>();  //создание рабочей области и добавление первых элементов очередей
             for (int i = 0; i < queues.Count; i++)                                  //подразумевается, что очереди не пустые
             {
                 workSpace.Add(queues[i].First);
             }
-            var sortedResult = SortingViaMax(workSpace);
+            var sortedResult = new List<RowStructure>();
+            if (!ascending)
+            {
+                sortedResult = SortingViaMax(workSpace);
+            }
+            else
+            {
+                sortedResult = SortingViaMin(workSpace);
+            }
+
             return sortedResult;
         }
         private static List<RowStructure> SortingViaMax(List<LinkedListNode<RowStructure>> workSpace)
@@ -248,6 +289,21 @@ namespace NewSORT
                 LinkedListNode<RowStructure> maxNode = FindMaxNode(workSpace);               //поиск максимального элемента в рабочей области
                 sortedValue.Add(maxNode.Value);                                     //добавление значения в результат
                 workSpace[workSpace.IndexOf(maxNode)] = maxNode.Next;               //продвежение очереди с максимальным элементом(первым) !наверное можно оптимизировать продвижение нескольких очередей
+                //Console.WriteLine(maxNode.Value.GetRow());
+            }
+
+            return sortedValue;
+        }
+
+        private static List<RowStructure> SortingViaMin(List<LinkedListNode<RowStructure>> workSpace)
+        {
+            List<RowStructure> sortedValue = new List<RowStructure>();
+
+            while (!IsWorkSapceEmpty(workSpace))                                    //проверка, что ещё есть элементы в очередях
+            {
+                LinkedListNode<RowStructure> minNode = FindMinNode(workSpace);               //поиск максимального элемента в рабочей области
+                sortedValue.Add(minNode.Value);                                     //добавление значения в результат
+                workSpace[workSpace.IndexOf(minNode)] = minNode.Next;               //продвежение очереди с максимальным элементом(первым) !наверное можно оптимизировать продвижение нескольких очередей
                 //Console.WriteLine(maxNode.Value.GetRow());
             }
 
@@ -279,6 +335,26 @@ namespace NewSORT
                     {
                         result = node;
                         maxValue = node.Value.SortingColumn;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        private static LinkedListNode<RowStructure> FindMinNode(List<LinkedListNode<RowStructure>> workSpace)
+        {
+            workSpace = DeleteEmptyNodes(workSpace);
+            LinkedListNode<RowStructure> result = workSpace.First();
+            if (workSpace.First() != null)
+            {
+                int minValue = workSpace.First().Value.SortingColumn;
+                foreach (LinkedListNode<RowStructure> node in workSpace)
+                {
+                    if (node.Value.SortingColumn < minValue)
+                    {
+                        result = node;
+                        minValue = node.Value.SortingColumn;
                     }
                 }
             }

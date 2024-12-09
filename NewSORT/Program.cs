@@ -183,5 +183,25 @@ namespace NewSORT
             }
 
         }
+
+        private static LinkedList<RowStructure> GetRows (string inputRow, int sortColumnNumber) {
+
+            LinkedList<RowStructure> output = new LinkedList<RowStructure>();
+            List<RowStructure> outList;
+            int index = 0;
+
+            int sortingColumn;
+
+
+            foreach (char c in inputRow)
+            {
+                index++;
+                inputRow.Substring()
+            }
+
+
+            return output;
+
+        }
     }
 }

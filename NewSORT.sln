@@ -1,9 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.35431.46
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35506.116 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewSORT", "NewSORT\NewSORT.csproj", "{18788D96-4945-4CE9-9330-B6FC83C7D0A9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestFiles", "TestFiles", "{96F4103D-2E11-439D-8967-82EF99F0E1A1}"
+	ProjectSection(SolutionItems) = preProject
+		NewSORT\bin\Debug\First1 = NewSORT\bin\Debug\First1
+		NewSORT\bin\Debug\First2 = NewSORT\bin\Debug\First2
+		NewSORT\bin\Debug\FirstB = NewSORT\bin\Debug\FirstB
+		NewSORT\bin\Debug\Last1_O = NewSORT\bin\Debug\Last1_O
+		NewSORT\bin\Debug\Last2_O = NewSORT\bin\Debug\Last2_O
+		NewSORT\bin\Debug\LastB = NewSORT\bin\Debug\LastB
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

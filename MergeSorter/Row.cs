@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 
 namespace MergeSorter
@@ -40,7 +41,7 @@ namespace MergeSorter
                         _sortKeys[i] = Int64.Parse(parts[field.Index]);
                         break;
                     case ColumnType.Float:
-                        _sortKeys[i] = Single.Parse(parts[field.Index]);
+                        _sortKeys[i] = Single.Parse(parts[field.Index].Replace(',','.'), NumberStyles.Number, CultureInfo.InvariantCulture);
                         break;
                     case ColumnType.Double:
                         _sortKeys[i] = Double.Parse(parts[field.Index]);
